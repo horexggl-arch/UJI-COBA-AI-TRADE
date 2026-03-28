@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Trader Vision FINAL</title>
+
+<style>
+body{
+  margin:0;
+  background:#0c1220;
+  color:white;
+  font-family:Arial;
+}
+.container{padding:15px;}
+
+.card{
+  background:#121a2f;
+  padding:15px;
+  border-radius:15px;
+  margin-bottom:15px;
+}
+
+input,select{
+  width:100%;
+  padding:10px;
+  margin:5px 0;
+  border:none;
+  border-radius:10px;
+  background:#0c1220;
+  color:white;
+}
+
+button{
+  width:100%;
+  padding:15px;
+  background:#00e5ff;
+  border:none;
+  border-radius:15px;
+  font-weight:bold;
+}
+
+img{
+  width:100%;
+  border-radius:10px;
+  margin-top:10px;
+}
+
+.buy{color:#00ff9f;}
+.sell{color:#ff4d6d;}
+.no{color:#aaa;}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card">
+<h3>📸 Upload Chart</h3>
+<input type="file" id="imgInput">
+<img id="preview">
+<p id="imgResult"></p>
+</div>
+
+<div class="card">
+<h3>📊 Data Tambahan</h3>
+<input id="price" placeholder="Price">
+<input id="rsi" placeholder="RSI">
+<input id="atr" placeholder="ATR">
+</div>
+
+<button onclick="analisa()">🚀 ANALISA AI</button>
+
+<div class="card">
+<h2 id="signal">WAIT</h2>
+<p id="reason"></p>
+</div>
+
+</div>
+
+<script>
+
+let trendAI = "neutral";
+let liquidityAI = false;
+
+// ================= IMAGE AI =================
+document.getElementById("imgInput").addEventListener("change", function(e){
+
+let file = e.target.files[0];
+let reader = new FileReader();
+
+reader.onload = function(){
+let img = new Image();
+img.src = reader.result;
+
+document.getElementById("preview").src = img.src;
+
+img.onload = function(){
+
+let canvas = document.createElement("canvas");
+let ctx = canvas.getContext("2d");
+
+canvas.width = img.width;
+canvas.height = img.height;
+
+ctx.drawImage(img,0,0);
+
+let data = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+
+let brightness = 0;
+let density = 0;
+
+for(let i=0;i<data.length;i+=4){
+let avg = (data[i]+data[i+1]+data[i+2])/3;
+brightness += avg;
+
+if(avg<80) density++;
+}
+
+brightness /= (data.length/4);
+
+// TREND ESTIMATION
+if(brightness>130) trendAI="up";
+else trendAI="down";
+
+// LIQUIDITY ESTIMATION
+liquidityAI = density > (data.length/4)*0.4;
+
+document.getElementById("imgResult").innerText =
+"Trend AI: "+trendAI+
+(liquidityAI?" | Likuiditas Tinggi":"");
+
+};
+
+};
+
+reader.readAsDataURL(file);
+});
+
+// ================= MAIN AI =================
+function analisa(){
+
+let price = parseFloat(document.getElementById("price").value);
+let rsi = parseFloat(document.getElementById("rsi").value);
+let atr = parseFloat(document.getElementById("atr").value);
+
+if(isNaN(price)||isNaN(rsi)||isNaN(atr)){
+return tampil("NO TRADE","Data tidak lengkap");
+}
+
+let buy=0,sell=0;
+
+// AI IMAGE
+if(trendAI==="up") buy+=3;
+if(trendAI==="down") sell+=3;
+
+// RSI
+if(rsi<35) buy+=2;
+if(rsi>65) sell+=2;
+
+// LIQUIDITY
+if(liquidityAI){
+buy+=1;
+sell+=1;
+}
+
+// FINAL
+if(Math.abs(buy-sell)<2){
+return tampil("NO TRADE","Market tidak jelas");
+}
+
+let signal = buy>sell?"BUY":"SELL";
+
+tampil(signal,"Gabungan AI Chart + Data");
+}
+
+function tampil(signal,reason){
+
+let s = document.getElementById("signal");
+
+s.innerText = signal;
+s.className =
+signal==="BUY"?"buy":
+signal==="SELL"?"sell":"no";
+
+document.getElementById("reason").innerText=reason;
+}
+
+</script>
+
+</body>
+</html>
