@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>AI Trader Vision • ULTIMATE v5.0</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+        
+        :root {
+            --neon: #00f7ff;
+            --purple: #9d4edd;
+        }
+        
+        * { margin:0; padding:0; box-sizing:border-box; }
+        
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: radial-gradient(circle at 50% 20%, #0a0f1f 0%, #0c1228 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding-bottom: 90px;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(90deg, transparent 49%, rgba(0,247,255,0.03) 50%, transparent 51%),
+                        linear-gradient(transparent 49%, rgba(0,247,255,0.03) 50%, transparent 51%);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: -1;
+            animation: gridMove 25s linear infinite;
+        }
+        
+        @keyframes gridMove { to { background-position: 60px 60px; } }
+        
+        .container { max-width: 100%; padding: 18px; margin: 0 auto; }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 24px;
+            padding: 14px 18px;
+            background: rgba(255,255,255,0.06);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(0,247,255,0.25);
+            box-shadow: 0 0 30px -10px var(--neon);
+        }
+        
+        .logo {
+            width: 54px;
+            height: 54px;
+            background: linear-gradient(135deg, var(--neon), #9d4edd);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 0 25px var(--neon);
+            animation: logoPulse 3s ease-in-out infinite;
+        }
+        
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -1.5px;
+            background: linear-gradient(90deg, #fff, var(--neon));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .badge {
+            background: linear-gradient(90deg, #00f7ff, #9d4edd);
+            color: #0a0f1f;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 6px 18px;
+            border-radius: 9999px;
+            box-shadow: 0 0 20px var(--neon);
+        }
+        
+        .card {
+            background: rgba(15, 22, 42, 0.75);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 22px;
+            margin-bottom: 18px;
+            border: 1px solid rgba(0,247,255,0.2);
+            box-shadow: 0 15px 35px -15px rgba(0,247,255,0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 60%;
+            height: 300%;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.15), transparent);
+            transform: rotate(25deg);
+            animation: shine 6s linear infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes shine { to { transform: translateX(200%); } }
+        
+        .glass-input {
+            width: 100%;
+            padding: 18px;
+            margin: 10px 0;
+            border-radius: 18px;
+            border: 2px solid rgba(0,247,255,0.3);
+            background: rgba(10,15,35,0.8);
+            color: white;
+            font-size: 17px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .glass-input:focus {
+            border-color: var(--neon);
+            box-shadow: 0 0 0 5px rgba(0,247,255,0.25);
+            transform: translateY(-1px);
+        }
+        
+        button {
+            width: 100%;
+            padding: 22px;
+            background: linear-gradient(90deg, #00f7ff, #9d4edd);
+            color: #0a0f1f;
+            border: none;
+            border-radius: 22px;
+            font-size: 19px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            box-shadow: 0 0 40px -10px var(--neon);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 8px;
+        }
+        
+        button:active {
+            transform: scale(0.96);
+            box-shadow: 0 0 25px 5px var(--neon);
+        }
+        
+        .signal {
+            font-size: 58px;
+            font-weight: 800;
+            font-family: 'Space Grotesk', sans-serif;
+            text-align: center;
+            padding: 18px 0;
+            margin: 18px 0;
+            border-radius: 24px;
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .buy { color: #00ff9f; text-shadow: 0 0 40px #00ff9f; }
+        .sell { color: #ff2d6d; text-shadow: 0 0 40px #ff2d6d; }
+        .no { color: #888; }
+        
+        img {
+            width: 100%;
+            border-radius: 20px;
+            margin-top: 14px;
+            border: 4px solid rgba(0,247,255,0.3);
+            box-shadow: 0 0 30px -10px var(--neon);
+        }
+        
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10,15,35,0.95);
+            backdrop-filter: blur(20px);
+            padding: 14px;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            border-top: 1px solid rgba(0,247,255,0.2);
+            z-index: 100;
+        }
+        
+        .neon-text {
+            text-shadow: 0 0 15px var(--neon);
+        }
+        
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="logo">📈</div>
+        <div>
+            <h1>AI TRADER VISION</h1>
+            <p class="neon-text" style="color:#00f7ff;font-weight:700;font-size:16px;margin-top:-4px;">ULTIMATE v5.0 • MT5</p>
+        </div>
+        <div class="badge">NEURAL AI</div>
+    </div>
+
+    <!-- MT5 GUIDE -->
+    <div class="card">
+        <h3 style="color:#00f7ff;margin-bottom:14px;font-size:17px;">📱 Cara Screenshot MT5 Mobile</h3>
+        <div style="display:flex;gap:14px;align-items:center;font-size:14px;line-height:1.6;">
+            <div style="background:#00f7ff;color:#0a0f1f;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;">1</div>
+            Buka chart MT5 → tekan lama → <strong>Screenshot</strong>
+        </div>
+        <div style="display:flex;gap:14px;align-items:center;font-size:14px;line-height:1.6;margin-top:10px;">
+            <div style="background:#00f7ff;color:#0a0f1f;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;">2</div>
+            Gunakan <strong>Dark Theme + Candlestick</strong>
+        </div>
+        <div style="font-size:13px;color:#aaa;margin-top:14px;padding-left:42px;">Paling akurat di H1 / H4 / D1</div>
+    </div>
+
+    <!-- UPLOAD -->
+    <div class="card">
+        <h3 style="margin-bottom:12px;color:#fff;font-size:18px;">📸 Upload Screenshot Chart MT5</h3>
+        <label style="cursor:pointer;display:block;">
+            <input type="file" id="imgInput" accept="image/*" style="display:none;">
+            <div id="uploadBox" style="border:3px dashed #00f7ff;border-radius:22px;padding:48px 20px;text-align:center;background:rgba(10,15,35,0.6);">
+                <div style="font-size:64px;margin-bottom:16px;filter:drop-shadow(0 0 20px #00f7ff);">📸</div>
+                <p style="font-weight:600;font-size:18px;">Ketuk untuk upload screenshot</p>
+                <p style="color:#00f7ff;font-size:14px;">PNG / JPG • Max 10MB</p>
+            </div>
+        </label>
+        
+        <img id="preview" class="hidden">
+        
+        <div id="imgAnalysis" style="margin-top:18px;display:flex;flex-wrap:wrap;gap:8px;font-size:13px;"></div>
+        
+        <button onclick="resetImage()" style="background:rgba(255,255,255,0.1);color:#fff;border:1px solid #00f7ff;margin-top:18px;padding:14px;font-size:15px;">🗑️ Ganti Screenshot</button>
+    </div>
+
+    <!-- INDICATOR DATA -->
+    <div class="card">
+        <h3 style="margin-bottom:14px;color:#fff;font-size:18px;">📊 Data Indikator MT5</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div>
+                <label style="font-size:13px;color:#aaa;display:block;margin-bottom:6px;">Harga Saat Ini</label>
+                <input id="price" type="number" step="0.00001" placeholder="65234.50" class="glass-input">
+            </div>
+            <div>
+                <label style="font-size:13px;color:#aaa;display:block;margin-bottom:6px;">RSI (14)</label>
+                <input id="rsi" type="number" step="0.1" placeholder="42.8" class="glass-input">
+            </div>
+            <div>
+                <label style="font-size:13px;color:#aaa;display:block;margin-bottom:6px;">ATR (14)</label>
+                <input id="atr" type="number" step="0.00001" placeholder="1245.30" class="glass-input">
+            </div>
+            <div>
+                <label style="font-size:13px;color:#aaa;display:block;margin-bottom:6px;">MACD Histogram</label>
+                <input id="macd" type="number" step="0.01" placeholder="+1.85" class="glass-input">
+            </div>
+        </div>
+
+        <label style="font-size:13px;color:#aaa;display:block;margin:18px 0 6px;">Timeframe</label>
+        <select id="timeframe" class="glass-input">
+            <option value="15">M15 (Scalping)</option>
+            <option value="60" selected>H1 (Rekomendasi)</option>
+            <option value="240">H4 (Swing)</option>
+            <option value="1440">D1 (Position)</option>
+        </select>
+    </div>
+
+    <!-- BUTTON -->
+    <button onclick="analisa()" id="btnAnalisa">
+        <span id="btnText">🚀 ANALISA NEURAL AI v5.0</span>
+    </button>
+
+    <!-- RESULT -->
+    <div id="resultCard" class="card" style="display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+            <h3 style="font-size:19px;">Hasil Analisa Neural AI</h3>
+            <div id="confidenceBox" style="background:rgba(10,15,35,0.8);padding:8px 20px;border-radius:9999px;font-weight:700;font-size:15px;box-shadow:0 0 20px var(--neon);"></div>
+        </div>
+        
+        <div id="signal" class="signal">WAIT</div>
+        
+        <div id="reason" style="background:rgba(10,15,35,0.8);border-radius:20px;padding:20px;font-size:15.5px;line-height:1.7;margin-bottom:20px;"></div>
+        
+        <div id="riskManagement"></div>
+        
+        <button onclick="resetAll()" style="background:rgba(255,255,255,0.1);color:#fff;border:1px solid #00f7ff;margin-top:24px;padding:16px;">🔄 Analisa Chart Baru</button>
+        
+        <p style="text-align:center;margin-top:24px;font-size:12.5px;color:#666;">⚠️ Hanya alat bantu • Bukan saran finansial • Selalu pakai manajemen risiko</p>
+    </div>
+
+</div>
+
+<div class="footer">
+    AI Trader Vision ULTIMATE v5.0 • 100% Client-Side • Optimized for MT5 + Acode
+</div>
+
+<script>
+    // ================= GLOBAL AI STATE v5.0 =================
+    let trendAI = "neutral";
+    let slopeStrength = 0;
+    let colorBias = 0;
+    let liquidityAI = false;
+    let volatilityAI = 0;
+    let lastCandleMomentum = 0;
+    let marketRegime = "trending";
+
+    // ================= ADVANCED IMAGE ANALYSIS v5.0 =================
+    function analyzeImage(img) {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        
+        const MAX_WIDTH = 520;
+        const ratio = MAX_WIDTH / img.width;
+        canvas.width = MAX_WIDTH;
+        canvas.height = Math.round(img.height * ratio);
+        
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+
+        let bgR = 0, bgG = 0, bgB = 0, countBg = 0;
+        const corners = [0, (canvas.width-1)*4, (canvas.height-1)*canvas.width*4, (canvas.height*canvas.width-1)*4];
+        corners.forEach(i => {
+            bgR += data[i]; bgG += data[i+1]; bgB += data[i+2]; countBg++;
+        });
+        bgR /= countBg; bgG /= countBg; bgB /= countBg;
+
+        const samples = 56;
+        const priceY = [];
+        let greenCount = 0, redCount = 0, activeCount = 0;
+        let lastFewY = [];
+
+        for (let i = 0; i < samples; i++) {
+            const x = Math.floor(i * canvas.width / samples);
+            let yTotal = 0, count = 0;
+
+            for (let y = 0; y < canvas.height; y++) {
+                const idx = (y * canvas.width + x) * 4;
+                const r = data[idx], g = data[idx+1], b = data[idx+2];
+
+                if (Math.abs(r - bgR) > 35 || Math.abs(g - bgG) > 35 || Math.abs(b - bgB) > 35) {
+                    yTotal += y;
+                    count++;
+                    activeCount++;
+
+                    if (g > 165 && r < 95 && b < 95) greenCount++;
+                    if (r > 165 && g < 95 && b < 95) redCount++;
+                }
+            }
+            if (count > 5) {
+                const avgY = yTotal / count;
+                priceY.push(avgY);
+                if (i > samples - 8) lastFewY.push(avgY);
+            } else {
+                priceY.push(canvas.height / 2);
+            }
+        }
+
+        let n = priceY.length;
+        let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+        for (let i = 0; i < n; i++) {
+            let x = i;
+            let y = priceY[i];
+            sumX += x; sumY += y; sumXY += x * y; sumX2 += x * x;
+        }
+        const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+        
+        trendAI = slope < 0 ? "up" : "down";
+        slopeStrength = Math.min(Math.abs(slope) * 14, 52);
+
+        const totalColor = greenCount + redCount;
+        colorBias = totalColor > 100 ? ((greenCount - redCount) / totalColor) * 100 : 0;
+
+        liquidityAI = activeCount > (canvas.width * canvas.height * 0.085);
+
+        const avgY = priceY.reduce((a,b)=>a+b,0) / n;
+        volatilityAI = Math.sqrt(priceY.reduce((acc,y)=>acc+Math.pow(y-avgY,2),0) / n);
+
+        if (lastFewY.length > 3) {
+            const recentSlope = (lastFewY[lastFewY.length-1] - lastFewY[0]) / lastFewY.length;
+            lastCandleMomentum = recentSlope < 0 ? Math.min(Math.abs(recentSlope) * 18, 100) : -Math.min(Math.abs(recentSlope) * 18, 100);
+        }
+
+        const atrPctEstimate = volatilityAI / canvas.height * 100;
+        if (atrPctEstimate > 4.5) marketRegime = "volatile";
+        else if (volatilityAI < 18) marketRegime = "ranging";
+        else marketRegime = "trending";
+
+        const el = document.getElementById("imgAnalysis");
+        el.innerHTML = `
+            <span style="background:#00f7ff;color:#0a0f1f;padding:6px 16px;border-radius:9999px;font-weight:700;">${trendAI.toUpperCase()} TREND</span>
+            <span style="background:rgba(157,78,221,0.3);padding:6px 16px;border-radius:9999px;">SLOPE ${slope.toFixed(2)}</span>
+            ${colorBias > 15 ? `<span style="background:#00ff9f;color:#0a0f1f;padding:6px 16px;border-radius:9999px;">BULLISH ${colorBias.toFixed(0)}%</span>` : ''}
+            ${colorBias < -15 ? `<span style="background:#ff2d6d;color:#fff;padding:6px 16px;border-radius:9999px;">BEARISH ${Math.abs(colorBias).toFixed(0)}%</span>` : ''}
+            ${liquidityAI ? `<span style="background:#ffb300;color:#0a0f1f;padding:6px 16px;border-radius:9999px;">LIQUID HIGH</span>` : ''}
+            <span style="background:#9d4edd;color:#fff;padding:6px 16px;border-radius:9999px;">${marketRegime.toUpperCase()}</span>
+        `;
+    }
+
+    // ================= NEURAL AI ENGINE v5.0 =================
+    function analisa() {
+        const btn = document.getElementById("btnAnalisa");
+        const text = document.getElementById("btnText");
+        
+        btn.disabled = true;
+        text.innerHTML = `<span class="spinner" style="display:inline-block;width:24px;height:24px;border:4px solid #0a0f1f;border-top:#fff;border-radius:50%;"></span> ANALISIS NEURAL...`;
+
+        const price = parseFloat(document.getElementById("price").value) || 0;
+        const rsi = parseFloat(document.getElementById("rsi").value) || 50;
+        const atr = parseFloat(document.getElementById("atr").value) || 0;
+        const macd = parseFloat(document.getElementById("macd").value) || 0;
+        const tf = parseInt(document.getElementById("timeframe").value);
+
+        if (price <= 0 || atr <= 0) {
+            alert("❌ Harap isi Harga dan ATR dengan benar!");
+            resetButton();
+            return;
+        }
+
+        let score = 0;
+        let reasons = [];
+
+        if (trendAI === "up") {
+            score += 42 + slopeStrength;
+            reasons.push(`✅ <strong>UPTREND KUAT</strong> (slope ${slopeStrength.toFixed(0)})`);
+        } else if (trendAI === "down") {
+            score -= 42 + slopeStrength;
+            reasons.push(`❌ <strong>DOWNTREND KUAT</strong> (slope ${slopeStrength.toFixed(0)})`);
+        }
+
+        if (lastCandleMomentum > 30) { score += 18; reasons.push("✅ Last candle bullish momentum"); }
+        if (lastCandleMomentum < -30) { score -= 18; reasons.push("❌ Last candle bearish momentum"); }
+
+        if (colorBias > 15) { score += 24; reasons.push(`✅ Candle hijau dominan (${colorBias.toFixed(0)}%)`); }
+        if (colorBias < -15) { score -= 24; reasons.push(`❌ Candle merah dominan (${Math.abs(colorBias).toFixed(0)}%)`); }
+        if (liquidityAI) { score += 16; reasons.push("✅ Likuiditas & aktivitas tinggi"); }
+
+        if (marketRegime === "ranging") score *= 0.65;
+        if (marketRegime === "volatile") score *= 0.78;
+
+        let rsiScore = 0;
+        if (rsi < 30) { rsiScore = 34; reasons.push("✅ RSI OVERSOLD"); }
+        else if (rsi > 70) { rsiScore = -34; reasons.push("❌ RSI OVERBOUGHT"); }
+        else if (rsi < 45) { rsiScore = 14; }
+        else if (rsi > 55) { rsiScore = -14; }
+        
+        if (trendAI === "up" && rsi < 45 && lastCandleMomentum < 0) {
+            rsiScore -= 22;
+            reasons.push("⚠️ Bearish divergence terdeteksi");
+        }
+        if (trendAI === "down" && rsi > 55 && lastCandleMomentum > 0) {
+            rsiScore += 22;
+            reasons.push("⚠️ Bullish divergence terdeteksi");
+        }
+        score += rsiScore;
+
+        if (macd > 0.4) { score += 19; reasons.push("✅ MACD histogram positif"); }
+        if (macd < -0.4) { score -= 19; reasons.push("❌ MACD histogram negatif"); }
+
+        const tfMultiplier = tf >= 240 ? 1.45 : tf >= 60 ? 1.25 : 1.1;
+        score *= tfMultiplier;
+
+        const atrPct = (atr / price) * 100;
+        if (atrPct > 3.5) { score *= 0.72; reasons.push(`⚠️ Volatilitas tinggi (${atrPct.toFixed(1)}%)`); }
+
+        const confidence = Math.min(Math.max(Math.abs(score) * 1.1, 38), 98);
+        
+        let signal = "NO TRADE";
+        let signalClass = "no";
+        let riskHTML = "";
+
+        if (score > 52) {
+            signal = "BUY";
+            signalClass = "buy";
+            const sl = (price - atr * 1.55).toFixed(2);
+            const tp1 = (price + atr * 3.1).toFixed(2);
+            
